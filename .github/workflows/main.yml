@@ -10,8 +10,8 @@ env:
   GAR_LOCATION: us-central1 
   GKE_CLUSTER: k8s-vas-qr-dev   
   GKE_ZONE: us-central1-c   
-  DEPLOYMENT_NAME: mf-qrs 
-  IMAGE_NAME: mf/qrs 
+  DEPLOYMENT_NAME: mf-execute-action 
+  IMAGE_NAME: mf/execute/action 
   REPOSITORY: samples 
   IMAGE: static-site
 
