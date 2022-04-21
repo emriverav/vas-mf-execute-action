@@ -6,7 +6,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mf-qrs
+      app: mf-execute-action
   template:
     metadata:
       labels:
