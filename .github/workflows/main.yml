@@ -84,5 +84,5 @@ jobs:
       uses: Co-qn/google-chat-notification@releases/v1
       with:
         name: Microfront end  Execute Action Build
-        url: https://chat.googleapis.com/v1/spaces/AAAAfRvRNBs/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=TuwHpdotghDRPqPp75FGc3otSUo_CiYQfyuMsJD8NYo%3D
+        url: https://chat.googleapis.com/v1/spaces/AAAAtckwQZ8/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=-zE7_jVuHU-exTkx_GB-N5EwL2FuJF6Gp0WVvtpmrfM%3D
         status: ${{ job.status }}
