@@ -20,7 +20,7 @@
      devServer: {
          port: npm_package_config_port,
          historyApiFallback: true,
-         open: '/execute'
+         open: '/execute/action'
      },
      devtool: 'eval-source-map',
      plugins: [
