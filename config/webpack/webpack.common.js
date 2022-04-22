@@ -69,7 +69,7 @@
      },
      plugins: [
         new ModuleFederationPlugin({
-            name: "",
+            name: "vas-mf-execute-action",
             filename: 'remoteEntry.js',
             remotes: {
             },
