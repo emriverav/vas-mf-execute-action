@@ -36,11 +36,11 @@ import { getBrowserId } from "../../Utils/FingerPrint";
     const [urlImg, setUrlImg] = useState("");
     const [category, setCategory] = useState("");
     const [error, setError] = useState("");
-    const [finger,setFinger]=useState("");
+    const [fingerprint, setFingerprint] = useState('')
 
     var client = new ClientJS();
 	var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
-    Alert(dataDevice)
+    alert(dataDevice)
     console.log("Data Device", dataDevice);
 	console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
 
