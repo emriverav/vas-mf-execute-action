@@ -24,8 +24,8 @@ const App = () => (
                 <Suspense fallback={<div>Loading...</div>}>
                     <Router>
                         <Routes>
-                            <Route path="/execute/action" element={ <ExecuteAction/> }/>
-                            <Route path="*" element={<Navigate to="/execute/action" replace />}/>
+                            <Route path="/execute" element={ <ExecuteAction/> }/>
+                            <Route path="*" element={<Navigate to="/execute" replace />}/>
                         </Routes>
                     </Router>
                 </Suspense>
