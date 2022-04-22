@@ -1,11 +1,11 @@
 {
-	"name": "App Vas Login",
-	"short_name": "App Vas Login",
+	"name": "App Vas ExceuteAction",
+	"short_name": "App Vas ExceuteAction",
 	"orientation": "portrait",
 	"display": "standalone",
 	"start_url": "/",
 	"scope": ".",
-	"description": "App Vas Login",
+	"description": "App Vas ExceuteAction",
 	"background_color": "#E10098",
 	"theme_color": "#E10098",
 	"icons": [
