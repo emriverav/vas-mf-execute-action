@@ -8,7 +8,7 @@
     "build": "webpack --config config/webpack/webpack.dev.js"
   },
   "config": {
-    "path": "/",
+    "path": "https://vas1.qr.liverpool.arr1aga.com/execute/",
     "name": "execute-action",
     "port": "3000",
     "remotes": {}
