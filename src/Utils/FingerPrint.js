@@ -37,5 +37,12 @@ export const getBrowserId = () =>{
     if(client.isIE()){
         browserId = "06";
     }
+    if(client.isMobileAndroid()){
+        browserId = "07";
+    }
+    if(client.isMobileIOS()){
+        browserId = "08";
+    }
+    
     return browserId;
 };

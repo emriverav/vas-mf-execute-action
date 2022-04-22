@@ -40,8 +40,8 @@ import { getBrowserId } from "../../Utils/FingerPrint";
 
     var client = new ClientJS();
 	var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
-    
     console.log("Data Device", dataDevice);
+    var finger = getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null);
 	console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
 
    
@@ -107,9 +107,17 @@ import { getBrowserId } from "../../Utils/FingerPrint";
                             {
                                 error ? error:null
                             }
+
+                            <h3>Data Device</h3>
                             {
                                 dataDevice
                             }
+
+                            <h4>FingerPrint</h4>
+                            {
+                               finger 
+                            }
+
 
                                                                                  
                         </Paper>
