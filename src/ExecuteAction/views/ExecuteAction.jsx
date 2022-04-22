@@ -24,58 +24,23 @@ import Video from '../../Video/Video';
 import Imagen from '../../Imagen/Imagen';
 import { Form } from '../../Form/Form';
 import { ClientJS } from 'clientjs';
+import { getBrowserId } from "../../Utils/FingerPrint";
+
 
  const View = (props) => {
 
     const [searchParams] = useSearchParams();
-    let idQr = searchParams.get('idQr');
+    var idQr = searchParams.get('idQr');
     const [resp, setResp]  = useState([]);
     const [value,setValue] = useState("");
     const [urlImg, setUrlImg] = useState("");
     const [category, setCategory] = useState("");
+    const [error, setError] = useState("");
+    const [finger,setFinger]=useState("");
 
-    const getBrowserId = () =>{
-        let client = new ClientJS();
-        let browserId = "00";
-        
-        // Opera 8.0+
-        let isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-        // Firefox 1.0+
-        let isFirefox = typeof InstallTrigger !== 'undefined';
-        // Safari 3.0+ "[object HTMLElementConstructor]" 
-        let isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
-        // Internet Explorer 6-11
-        let isIE = /*@cc_on!@*/false || !!document.documentMode;
-        // Edge 20+
-        let isEdge = !isIE && !!window.StyleMedia;
-        // Chrome 1 - 79
-        let isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-        // Edge (based on chromium) detection
-        let isEdgeChromium = isChrome && (navigator.userAgent.indexOf("Edg") != -1);
-    
-        if(client.isFirefox()){
-            browserId = "01";
-        }
-        if(client.isChrome()){
-            browserId = "02";
-        }
-        if(client.isOpera()){
-            browserId = "03";
-        }
-        if(client.isSafari() || client.isMobileSafari()){
-            browserId = "04";
-        }
-        if(isEdge || isEdgeChromium){
-            browserId = "05";
-        }
-        if(client.isIE()){
-            browserId = "06";
-        }
-        return browserId;
-    };
-
-    let client = new ClientJS();
-	let dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
+    var client = new ClientJS();
+	var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
+    Alert(dataDevice)
     console.log("Data Device", dataDevice);
 	console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
 
@@ -96,21 +61,27 @@ import { ClientJS } from 'clientjs';
           const response = await fetch(url);
           const data = await response.json();
         
-          if(data.qr.image){
-            setUrlImg(data.qr.image)
+            if(data.qr.image){
+                setUrlImg(data.qr.image)
+            }
+            setResp(data.qr.action)
+            setValue(data.qr.value)
+            
+            if(data.qr.subcategory){
+                const myArray = data.qr.subcategory.split("|");
+                setCategory(myArray[1])
+            }
+         
         }
-          setResp(data.qr.action)
-          setValue(data.qr.value)
-        
-          const myArray = data.qr.subcategory.split("|");
-          
-          setCategory(myArray[1])
-          
+
+        if(idQr){
+            fetchMyAPI()
+            // make sure to catch any error
+            .catch(console.error);
         }
-    
-        fetchMyAPI()
-        // make sure to catch any error
-        .catch(console.error);
+        else{
+            setError("No hay IDQR")
+        }
 
       }, [])
 
@@ -131,12 +102,18 @@ import { ClientJS } from 'clientjs';
                             </Typography>
                             <Divider /> 
                             {
-                              resp == '003' ?  <Imagen url={`${urlImg}`} href={`${value}`}/> : ( resp == '002' ? <Video url={`${value}`}/> : <Form val = {`${value}`} />) 
+                             resp == '003' ?  <Imagen url={`${urlImg}`} href={`${value}`}/> : ( resp == '002' ? <Video url={`${value}`}/> : <Form val = {`${value}`} />) 
                             }
+                            {
+                                error ? error:null
+                            }
+
+                                                                                 
                         </Paper>
                         
                     </Grid>
                     <Grid item xs={12} sm={3} lg={4} />
+                    
                 </Grid>      
             </CardContent>
             <Footer/>
