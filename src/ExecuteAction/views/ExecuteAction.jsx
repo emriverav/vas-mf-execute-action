@@ -35,14 +35,16 @@ import { getBrowserId } from "../../Utils/FingerPrint";
     const [value,setValue] = useState("");
     const [urlImg, setUrlImg] = useState("");
     const [category, setCategory] = useState("");
-    const [error, setError] = useState("");
-    const [fingerprint, setFingerprint] = useState('')
+    const [error, setError] = useState([]);
+    const [address, setAddress]= useState("");
+    const [errorGeolocation, setErrorGeo]=useState("");
+    
 
     var client = new ClientJS();
 	var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
-    console.log("Data Device", dataDevice);
+    //console.log("Data Device", dataDevice);
     var finger = getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null);
-	console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
+	//console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
 
    
     if(idQr){
@@ -56,34 +58,103 @@ import { getBrowserId } from "../../Utils/FingerPrint";
     useEffect(() => {
         const   fetchMyAPI = async () =>  {
           //let url = "http://localhost:8089/qrs/4619bc5b-4139-405a-83fb-df6fb1b302ba"
-          
-          let url = `${process.env.APIURL}${idQr}` 
-          const response = await fetch(url);
-          const data = await response.json();
         
-            if(data.qr.image){
-                setUrlImg(data.qr.image)
-            }
-            setResp(data.qr.action)
-            setValue(data.qr.value)
-            
-            if(data.qr.subcategory){
-                const myArray = data.qr.subcategory.split("|");
-                setCategory(myArray[1])
-            }
+          try {
+
+            let url = `${process.env.APIURL}${idQr}` 
+            const response = await fetch(url);
+    
+            if (response.status == 200) {
+                const data = await response.json();
+
+                if(data && data.qr.image){
+                    setUrlImg(data.qr.image)
+                }
+                setResp(data.qr.action)
+                setValue(data.qr.value)
+                
+                if(data && data.qr.subcategory){
+                    const myArray = data.qr.subcategory.split("|");
+                    setCategory(myArray[1])
+                }
+               
+              } else {
+                throw  new Error(response.status);
+              }
          
+          } catch(err) {
+            // atrapa errores tanto en fetch como en response.json
+            console.log("Error Peticion ", err );
+            //setError(err)
+          }
+        
         }
 
         if(idQr){
             fetchMyAPI()
-            // make sure to catch any error
-            .catch(console.error);
         }
         else{
             setError("No hay IDQR")
         }
 
       }, [])
+
+      
+  var geocoder, map;
+  function initialize() {
+    geocoder = new google.maps.Geocoder();
+    var latlng = new google.maps.LatLng(-34.397, 150.644);
+    var mapOptions = {
+      zoom: 8,
+      center: latlng
+    }
+    map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  }
+
+  function codeAddress(longitud, latitud) {
+    //console.log("Detect", longitud+","+latitud)
+    var address = (longitud+","+latitud);
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == 'OK') {
+         //console.log("mapaComplet",results)
+         setAddress(results[1].formatted_address)
+        map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+      } else {
+        setErrorGeo('Geocode was not successful for the following reason: ' + status);
+      }
+    });
+  }
+
+      useEffect(()=>{
+
+        initialize();
+        var options = {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          };
+          
+          function success(pos) {
+            var crd = pos.coords;
+            //console.log('Your current position is:');
+            //console.log(`Latitude : ${crd.latitude}`);
+            //console.log(`Longitude: ${crd.longitude}`);
+            codeAddress(crd.latitude, crd.longitude)
+            //console.log(`More or less ${crd.accuracy} meters.`);
+          }
+          
+          function error(err) {
+            setErrorGeo(`ERROR(${err.code}): ${err.message}`)
+          }
+          
+          navigator.geolocation.watchPosition(success, error, options);
+
+    },[])
+
 
     return (
         <>
@@ -102,10 +173,10 @@ import { getBrowserId } from "../../Utils/FingerPrint";
                             </Typography>
                             <Divider /> 
                             {
-                             resp == '003' ?  <Imagen url={`${urlImg}`} href={`${value}`}/> : ( resp == '002' ? <Video url={`${value}`}/> : <Form val = {`${value}`} />) 
+                             resp == '003' ?  <Imagen url={`${urlImg}`} href={`${value}`}/> : ( resp == '002' ? <Video url={`${value}`}/> : <Form val = {`${value}`} />)
                             }
                             {
-                                error ? error:null
+                                error ? error  : null
                             }
 
                             <h3>Data Device</h3>
@@ -117,14 +188,19 @@ import { getBrowserId } from "../../Utils/FingerPrint";
                             {
                                finger 
                             }
-
-
-                                                                                 
+                        
+                            <p>  
+                                {
+                                    address ? address : errorGeolocation
+                                }
+                            </p>                                                    
                         </Paper>
                         
                     </Grid>
                     <Grid item xs={12} sm={3} lg={4} />
                     
+                    <div id="map" style= {{width: 100 + 'px', height:100+'px', display: 'none'}} ></div>
+                                      
                 </Grid>      
             </CardContent>
             <Footer/>
