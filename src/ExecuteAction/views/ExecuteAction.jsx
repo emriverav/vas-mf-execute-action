@@ -151,7 +151,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             setErrorGeo(`ERROR(${err.code}): ${err.message}`)
           }
           
-          navigator.geolocation.watchPosition(success, error, options);
+          navigator.geolocation.getCurrentPosition(success, error, options);
 
     },[])
 
