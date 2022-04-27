@@ -24,7 +24,7 @@ import Video from '../../Video/Video';
 import Imagen from '../../Imagen/Imagen';
 import { Form } from '../../Form/Form';
 import { ClientJS } from 'clientjs';
-import { getBrowserId } from "../../Utils/FingerPrint";
+import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
 
  const View = (props) => {
@@ -38,14 +38,14 @@ import { getBrowserId } from "../../Utils/FingerPrint";
     const [error, setError] = useState([]);
     const [address, setAddress]= useState("");
     const [errorGeolocation, setErrorGeo]=useState("");
-    
 
     var client = new ClientJS();
 	var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
     //console.log("Data Device", dataDevice);
+    var device = getDevice();
     var finger = getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null);
 	//console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
-
+    
    
     if(idQr){
         sessionStorage.setItem("idQr", searchParams.get('idQr'));
@@ -193,7 +193,12 @@ import { getBrowserId } from "../../Utils/FingerPrint";
                                 {
                                     address ? address : errorGeolocation
                                 }
-                            </p>                                                    
+                            </p>  
+                            <p>
+                                {
+                                    device ? device : null
+                                }
+                            </p>                                                  
                         </Paper>
                         
                     </Grid>

@@ -46,3 +46,32 @@ export const getBrowserId = () =>{
     
     return browserId;
 };
+
+export const getDevice = () =>{
+    var client = new ClientJS();
+    var deviceId = "";
+    var isMobileAndroid = client.isMobileAndroid(); 
+    var isMobileIOS = client.isMobileIOS(); // Check For Mobile iOS
+
+    if(isMobileAndroid){
+        deviceId="Android"
+    }
+    if(isMobileIOS){
+
+        var isIphone = client.isIphone(); // Check For iPhone
+        var isIpad = client.isIpad(); // Check For iPad
+        var isIpod = client.isIpod(); // Check For iPod
+
+        if(isIphone){
+            deviceId ="IOS "+ "iPhone";
+        }
+        if(isIpad){
+            deviceId ="IOS "+ "iPad";
+        }
+        if(isIpod){
+            deviceId ="IOS "+ "iPod";
+        }
+    }
+ 
+    return deviceId;
+}
