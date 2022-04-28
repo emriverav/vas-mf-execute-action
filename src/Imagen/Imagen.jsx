@@ -1,6 +1,7 @@
 import React from 'react'
 
 const Imagen = (props) => {
+
   return (
       <>
         <a href={props.href} target="_blank">
