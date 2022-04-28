@@ -162,28 +162,6 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
   }
 
 
-        initialize();
-        var options = {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-          };
-          
-          function success(pos) {
-            var crd = pos.coords;
-            //console.log('Your current position is:');
-            //console.log(`Latitude : ${crd.latitude}`);
-            //console.log(`Longitude: ${crd.longitude}`);
-            codeAddress(crd.latitude, crd.longitude)
-            //console.log(`More or less ${crd.accuracy} meters.`);
-          }
-          
-          function errorGeo(err) {
-            setErrorGeo(`ERROR(${err.code}): ${err.message}`)
-          }
-          
-          navigator.geolocation.getCurrentPosition(success, errorGeo, options);
-
     var obj ={
     "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site"   ) ,
     "address": address ? address : null,
