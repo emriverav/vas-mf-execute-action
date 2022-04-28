@@ -31,9 +31,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     const [searchParams] = useSearchParams();
     var idQr = searchParams.get('idQr');
     const [resp, setResp]  = useState([]);
-    const [value,setValue] = useState("");
-    const [urlImg, setUrlImg] = useState("");
-    const [category, setCategory] = useState("");
+
     const [error, setError] = useState([]);
     const [address, setAddress]= useState("");
     const [errorGeolocation, setErrorGeo]=useState("");
@@ -71,16 +69,20 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             if (response.status == 200) {
                 const data = await response.json();
 
-                if(data && data.qr.image){
-                    setUrlImg(data.qr.image)
+                if(data.qr){
+                  setResp(data.qr)
+                  console.log("Data", resp)
                 }
-                setResp(data.qr)
-                setValue(data.qr.value)
-                
-                if(data && data.qr.subcategory){
-
-                    setCategory( data.qr.subcategory)
+                if(data.response.code==1000){
+                  setError("QR no está activo")
                 }
+                if(data.response.code==1001){
+                  setError("QR aun no está vigente")
+                }
+                if(data.response.code==1002){
+                  setError("QR Vigencia Expirada")
+                }
+               
                
               } else {
                 throw  new Error(response.status);
@@ -89,7 +91,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
           } catch(err) {
             // atrapa errores tanto en fetch como en response.json
             console.log("Error Peticion ", err );
-            //setError(err)
+            setError(err)
           }
         
         }
@@ -124,7 +126,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             setErrorGeo(`ERROR(${err.code}): ${err.message}`)
           }
           
-        navigator.geolocation.getCurrentPosition(success, error, options);
+       navigator.geolocation.getCurrentPosition(success, error, options);
 
       }, [])
 
@@ -176,7 +178,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     "id_qr": idQr,
     "latitude": "",
     "longitude": "",
-    "subcategory": category,
+    "subcategory": resp.subcategory,
     "typeDevice":  device 
   }
  
@@ -221,17 +223,15 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                     <Grid item xs={12} sm={6} lg={4} className={mt3}>
                         <Paper className={paperContainer}>
                             <Typography variant='subtitle1' className={title}>
-                                Categoría : {  category.split("|")[1] }
+                                Categoría : {  resp.subcategory ? resp.subcategory.split("|")[1] : null }
                             </Typography>
-                            <Divider /> 
+                            <Divider />
+                         
                             {
-                             resp == '003' ?  <Imagen url={`${urlImg}`} href={`${value}`}/> : ( resp == '002' ? <Video url={`${value}`}/> : <Form val = {`${value}`} />)
-                            }
-                            {
-                                error ? error  : null
-                            }
 
-                                                                              
+                             resp ?  (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} />) ) : error
+                            }
+                                                                                                        
                         </Paper>
                         
                     </Grid>
