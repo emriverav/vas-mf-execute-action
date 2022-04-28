@@ -178,11 +178,11 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             //console.log(`More or less ${crd.accuracy} meters.`);
           }
           
-          function error(err) {
+          function errorGeo(err) {
             setErrorGeo(`ERROR(${err.code}): ${err.message}`)
           }
           
-          navigator.geolocation.getCurrentPosition(success, error, options);
+          navigator.geolocation.getCurrentPosition(success, errorGeo, options);
 
     var obj ={
     "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site"   ) ,
