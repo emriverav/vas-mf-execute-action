@@ -28,7 +28,6 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
 
  const View = (props) => {
-
     const [searchParams] = useSearchParams();
     var idQr = searchParams.get('idQr');
     const [resp, setResp]  = useState([]);
@@ -38,29 +37,34 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     const [error, setError] = useState([]);
     const [address, setAddress]= useState("");
     const [errorGeolocation, setErrorGeo]=useState("");
+    const [geolocation,setGeolocation] =useState([]);
+
+  
 
     var client = new ClientJS();
-	var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
+	  var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
     //console.log("Data Device", dataDevice);
     var device = getDevice();
     var finger = getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null);
 	//console.log("FingerPrint:  "+ getBrowserId() + "-" +client.getCustomFingerprint(dataDevice, null));
-    
-   
     if(idQr){
         sessionStorage.setItem("idQr", searchParams.get('idQr'));
+        const url = '/execute/action/';    
+        history.pushState('', '', url)
     }
     if (sessionStorage.getItem("idQr")){
         idQr = sessionStorage.getItem("idQr")
     }
-    const { mt3, paperContainer, title } = useStyles();
+
+    const { mt3, paperContainer, title } = useStyles();  
+    
+
 
     useEffect(() => {
         const   fetchMyAPI = async () =>  {
           //let url = "http://localhost:8089/qrs/4619bc5b-4139-405a-83fb-df6fb1b302ba"
         
           try {
-
             let url = `${process.env.APIURL}${idQr}` 
             const response = await fetch(url);
     
@@ -70,12 +74,12 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                 if(data && data.qr.image){
                     setUrlImg(data.qr.image)
                 }
-                setResp(data.qr.action)
+                setResp(data.qr)
                 setValue(data.qr.value)
                 
                 if(data && data.qr.subcategory){
-                    const myArray = data.qr.subcategory.split("|");
-                    setCategory(myArray[1])
+
+                    setCategory( data.qr.subcategory)
                 }
                
               } else {
@@ -92,10 +96,35 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
         if(idQr){
             fetchMyAPI()
+            
         }
         else{
             setError("No hay IDQR")
         }
+
+        initialize();
+        var options = {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          };
+          
+          function success(pos) {
+            var crd = pos.coords;
+            //console.log('Your current position is:');
+            //console.log(`Latitude : ${crd.latitude}`);
+            //console.log(`Longitude: ${crd.longitude}`);
+            codeAddress(crd.latitude, crd.longitude)
+            //setGeolocation([{"latitude" : crd.latitude}, {"longitude" :crd.longitude }])
+            
+            //console.log(`More or less ${crd.accuracy} meters.`);
+          }
+          
+          function error(err) {
+            setErrorGeo(`ERROR(${err.code}): ${err.message}`)
+          }
+          
+        navigator.geolocation.getCurrentPosition(success, error, options);
 
       }, [])
 
@@ -129,33 +158,56 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     });
   }
 
-      useEffect(()=>{
 
-        initialize();
-        var options = {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-          };
-          
-          function success(pos) {
-            var crd = pos.coords;
-            //console.log('Your current position is:');
-            //console.log(`Latitude : ${crd.latitude}`);
-            //console.log(`Longitude: ${crd.longitude}`);
-            codeAddress(crd.latitude, crd.longitude)
-            //console.log(`More or less ${crd.accuracy} meters.`);
-          }
-          
-          function error(err) {
-            setErrorGeo(`ERROR(${err.code}): ${err.message}`)
-          }
-          
-          navigator.geolocation.watchPosition(success, error, options);
+    //obj = { "typeDevice" : device, "subcategory": category, "id_qr": idQr, "latitude" : "", "longitude" :"", "idAction" : resp.action, "idCat": resp.idCat, "idForm": "", finger };
+    //console.log(obj)
+    //sessionStorage.setItem("dataMetrics",JSON.stringify(obj))
 
-    },[])
+    var obj ={
+    "description": "Acción by Erick 2",
+    "address": address,
+    "addressState": "",
+    "addressZipCode": "",
+    "date": "28/04/2022 MM/DD/YYYY",
+    "fingerPrint": finger,
+    "idAction": resp.action,
+    "idCat": resp.idCat,
+    "idForm": "",
+    "id_qr": idQr,
+    "latitude": "",
+    "longitude": "",
+    "subcategory": category,
+    "typeDevice":  device 
+  }
+ 
+  console.log(obj)
+
+  async function addMetrics() {
+
+    const optionsPost = { 
+      method: 'POST', 
+      body: JSON.stringify(obj),
+      headers: {
+            'Content-Type': 'application/json'
+          }    
+    };
 
 
+    try {
+      let response = await fetch(`${process.env}`, optionsPost);
+      //let insertResp = await response.json();
+      //console.log(insertResp)
+    } catch(err) {
+      // atrapa errores tanto en fetch como en response.json
+      alert(err);
+    }
+  }
+
+
+  addMetrics()
+
+  
+  
     return (
         <>
             <Header/>
@@ -169,7 +221,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                     <Grid item xs={12} sm={6} lg={4} className={mt3}>
                         <Paper className={paperContainer}>
                             <Typography variant='subtitle1' className={title}>
-                                Categoría : {category }
+                                Categoría : {  category.split("|")[1] }
                             </Typography>
                             <Divider /> 
                             {
@@ -179,33 +231,14 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                                 error ? error  : null
                             }
 
-                            <h3>Data Device</h3>
-                            {
-                                dataDevice
-                            }
-
-                            <h4>FingerPrint</h4>
-                            {
-                               finger 
-                            }
-                        
-                            <p>  
-                                {
-                                    address ? address : errorGeolocation
-                                }
-                            </p>  
-                            <p>
-                                {
-                                    device ? device : null
-                                }
-                            </p>                                                  
+                                                                              
                         </Paper>
                         
                     </Grid>
                     <Grid item xs={12} sm={3} lg={4} />
                     
                     <div id="map" style= {{width: 100 + 'px', height:100+'px', display: 'none'}} ></div>
-                                      
+                                  
                 </Grid>      
             </CardContent>
             <Footer/>
