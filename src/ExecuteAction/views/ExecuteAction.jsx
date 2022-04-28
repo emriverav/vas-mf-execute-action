@@ -71,7 +71,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
                 if(data.qr){
                   setResp(data.qr)
-                  console.log("Data", resp)
+                }else{
+                  setError("No hay Datos para Mostrar")
                 }
                 if(data.response.code==1000){
                   setError("QR no está activo")
@@ -117,7 +118,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             //console.log(`Latitude : ${crd.latitude}`);
             //console.log(`Longitude: ${crd.longitude}`);
             codeAddress(crd.latitude, crd.longitude)
-            //setGeolocation([{"latitude" : crd.latitude}, {"longitude" :crd.longitude }])
+            setGeolocation([crd.latitude, crd.longitude])
             
             //console.log(`More or less ${crd.accuracy} meters.`);
           }
@@ -166,25 +167,28 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     //sessionStorage.setItem("dataMetrics",JSON.stringify(obj))
 
     var obj ={
-    "description": "Acción by Erick 2",
-    "address": address,
-    "addressState": "",
-    "addressZipCode": "",
-    "date": "28/04/2022 MM/DD/YYYY",
-    "fingerPrint": finger,
-    "idAction": resp.action,
-    "idCat": resp.idCat,
-    "idForm": "",
-    "id_qr": idQr,
-    "latitude": "",
-    "longitude": "",
-    "subcategory": resp.subcategory,
-    "typeDevice":  device 
+    "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site"   ) ,
+    "address": address ? address : null,
+    "addressState": address ? address.split(",").reverse()[2] : null,
+    "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
+    "date": new Date().toLocaleString(),
+    "fingerPrint": finger? finger: finger,
+    "idAction": resp.action ? resp.action : null,
+    "idCat": resp.idCat ?  resp.idCat: null,
+    "idForm": resp.idForm ? resp.idForm : null,
+    "id_qr": idQr ? idQr : null,
+    "latitude": geolocation ? geolocation[0] :null,
+    "longitude": geolocation ? geolocation[1] :null,
+    "subcategory": resp.subcategory ? resp.subcategory : null ,
+    "typeDevice":  device ? device : null 
   }
  
-  console.log(obj)
 
-  async function addMetrics() {
+  if(obj.address!== null && obj.description!==null && obj.fingerPrint!==null){
+    addMetrics(obj)
+  }
+
+  async function addMetrics(obj) {
 
     const optionsPost = { 
       method: 'POST', 
@@ -196,17 +200,17 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
 
     try {
-      let response = await fetch(`${process.env}`, optionsPost);
-      //let insertResp = await response.json();
-      //console.log(insertResp)
+      let response = await fetch(`${process.env.APIURLMETRICS}`, optionsPost);
+      let insertResp = await response.json();
+      console.log(insertResp)
     } catch(err) {
       // atrapa errores tanto en fetch como en response.json
-      alert(err);
+      console.log(err);
     }
   }
 
 
-  addMetrics()
+
 
   
   
@@ -228,10 +232,9 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                             <Divider />
                          
                             {
-
-                             resp ?  (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} />) ) : error
+                             resp.length<=0  ? error : (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} />))
                             }
-                                                                                                        
+                                                                             
                         </Paper>
                         
                     </Grid>
