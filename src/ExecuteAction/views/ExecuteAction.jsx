@@ -165,7 +165,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     var obj ={
     "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site"   ) ,
     "address": address ? address : null,
-    "addressState": address ? address.split(",").reverse()[2] : null,
+    "addressState": address ? address.split(",").reverse()[1] : null,
     "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
     "date": new Date().toLocaleString(),
     "fingerPrint": finger? finger: finger,
