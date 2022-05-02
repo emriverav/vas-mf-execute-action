@@ -178,9 +178,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     "subcategory": resp.subcategory ? resp.subcategory : null ,
     "typeDevice":  device ? device : null 
   }
- 
 
-  if(obj.address!== null && obj.description!==null && obj.fingerPrint!==null){
+  if(obj.typeDevice!== null && obj.fingerPrint!==null && obj.date!==null){
     addMetrics(obj)
   }
 
