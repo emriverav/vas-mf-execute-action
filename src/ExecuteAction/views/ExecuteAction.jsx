@@ -167,19 +167,21 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     "address": address ? address : null,
     "addressState": address ? address.split(",").reverse()[1] : null,
     "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
-    "date": new Date().toLocaleString(),
+    "creationDate": new  Date(Date.now()).toISOString(),
     "fingerPrint": finger? finger: finger,
     "idAction": resp.action ? resp.action : null,
     "idCat": resp.idCat ?  resp.idCat: null,
     "idForm": resp.idForm ? resp.idForm : null,
-    "id_qr": idQr ? idQr : null,
+    "idQr": idQr ? idQr : null,
     "latitude": geolocation ? geolocation[0] :null,
     "longitude": geolocation ? geolocation[1] :null,
     "subcategory": resp.subcategory ? resp.subcategory : null ,
-    "typeDevice":  device ? device : null 
+    "typeDevice":  device ? device : null,
+    "startDate": new  Date(Date.now()).toISOString()
   }
 
-  if(obj.typeDevice!== null && obj.fingerPrint!==null && obj.date!==null){
+
+  if(obj.typeDevice!==null && obj.fingerPrint!==null && obj.creationDate!==null && obj.startDate!==null){
     addMetrics(obj)
   }
 
@@ -203,11 +205,6 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
       console.log(err);
     }
   }
-
-
-
-
-  
   
     return (
         <>
