@@ -55,10 +55,9 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     }
 
     const { mt3, paperContainer, title } = useStyles();  
-    
-
 
     useEffect(() => {
+  
         const   fetchMyAPI = async () =>  {
           //let url = "http://localhost:8089/qrs/4619bc5b-4139-405a-83fb-df6fb1b302ba"
         
@@ -129,6 +128,51 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
           
        navigator.geolocation.getCurrentPosition(success, errorGeo, options);
 
+       //Insert Metrics
+
+       var obj ={
+        "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) ,
+        "address": address ? address : null,
+        "addressState": address ? address.split(",").reverse()[1] : null,
+        "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
+        "creationDate": new  Date(Date.now()).toISOString(),
+        "fingerPrint": finger? finger: finger,
+        "idAction": resp.action ? resp.action : null,
+        "idCat": resp.idCat ?  resp.idCat: null,
+        "idForm": resp.idForm ? resp.idForm : null,
+        "idQr": idQr ? idQr : null,
+        "latitude": geolocation ? geolocation[0] :"",
+        "longitude": geolocation ? geolocation[1] :"",
+        "subcategory": resp.subcategory ? resp.subcategory : null ,
+        "typeDevice":  device ? device : null,
+        "startDate": new  Date(Date.now()).toISOString()
+      }
+    
+      if(obj.idQr!==null && obj.typeDevice!==null && obj.fingerPrint!==null && obj.creationDate!==null && obj.startDate!==null){
+        addMetrics(obj)
+      }
+    
+      async function addMetrics(obj) {
+    
+        const optionsPost = { 
+          method: 'POST', 
+          body: JSON.stringify(obj),
+          headers: {
+                'Content-Type': 'application/json'
+              }    
+        };
+    
+    
+        try {
+          let response = await fetch(`${process.env.APIURLMETRICS}`, optionsPost);
+          let insertResp = await response.json();
+          console.log(insertResp)
+        } catch(err) {
+          // atrapa errores tanto en fetch como en response.json
+          console.log(err);
+        }
+      }
+
       }, [])
 
       
@@ -161,50 +205,6 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     });
   }
 
-
-    var obj ={
-    "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site"   ) ,
-    "address": address ? address : null,
-    "addressState": address ? address.split(",").reverse()[1] : null,
-    "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
-    "creationDate": new  Date(Date.now()).toISOString(),
-    "fingerPrint": finger? finger: finger,
-    "idAction": resp.action ? resp.action : null,
-    "idCat": resp.idCat ?  resp.idCat: null,
-    "idForm": resp.idForm ? resp.idForm : null,
-    "idQr": idQr ? idQr : null,
-    "latitude": geolocation ? geolocation[0] :null,
-    "longitude": geolocation ? geolocation[1] :null,
-    "subcategory": resp.subcategory ? resp.subcategory : null ,
-    "typeDevice":  device ? device : null,
-    "startDate": new  Date(Date.now()).toISOString()
-  }
-
-
-  if(obj.typeDevice!==null && obj.fingerPrint!==null && obj.creationDate!==null && obj.startDate!==null){
-    addMetrics(obj)
-  }
-
-  async function addMetrics(obj) {
-
-    const optionsPost = { 
-      method: 'POST', 
-      body: JSON.stringify(obj),
-      headers: {
-            'Content-Type': 'application/json'
-          }    
-    };
-
-
-    try {
-      let response = await fetch(`${process.env.APIURLMETRICS}`, optionsPost);
-      let insertResp = await response.json();
-      console.log(insertResp)
-    } catch(err) {
-      // atrapa errores tanto en fetch como en response.json
-      console.log(err);
-    }
-  }
   
     return (
         <>
