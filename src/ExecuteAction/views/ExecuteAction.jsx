@@ -8,7 +8,7 @@
  * @description: Vista del componente Login.
  **/
 
- import React,{useEffect, useState} from 'react';
+ import React,{useEffect, useMemo, useState} from 'react';
  import Header from '../../Header/views/Header';
  import Footer from '../../Footer/views/Footer';
  import useStyles from './styles/Login.style';
@@ -27,6 +27,7 @@ import { ClientJS } from 'clientjs';
 import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
 
+
  const View = (props) => {
     const [searchParams] = useSearchParams();
     var idQr = searchParams.get('idQr');
@@ -36,8 +37,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     const [address, setAddress]= useState("");
     const [errorGeolocation, setErrorGeo]=useState("");
     const [geolocation,setGeolocation] =useState([]);
-
-  
+    const [myArray, setMyArray] = useState([]);
 
     var client = new ClientJS();
 	  var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
@@ -103,36 +103,67 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
         else{
             setError("No hay IDQR")
         }
+        if (navigator.geolocation) {
 
-        initialize();
-        var options = {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-          };
-          
-          function success(pos) {
-            var crd = pos.coords;
-            //console.log('Your current position is:');
-            //console.log(`Latitude : ${crd.latitude}`);
-            //console.log(`Longitude: ${crd.longitude}`);
-            codeAddress(crd.latitude, crd.longitude)
-            setGeolocation([crd.latitude, crd.longitude])
+          initialize();
+          var options = {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            };
             
-            //console.log(`More or less ${crd.accuracy} meters.`);
-          }
+            function success(pos) {
+              var crd = pos.coords;
+              //console.log('Your current position is:');
+              //console.log(`Latitude : ${crd.latitude}`);
+              //console.log(`Longitude: ${crd.longitude}`);
+              codeAddress(crd.latitude, crd.longitude)
+              setGeolocation([crd.latitude, crd.longitude])
+              //console.log(`More or less ${crd.accuracy} meters.`);
+            }
+            
+            function errorGeo(err) {
+              setErrorGeo(`ERROR(${err.code}): ${err.message}`)
+            }
+            
+         navigator.geolocation.getCurrentPosition(success, errorGeo, options);
           
-          function errorGeo(err) {
-            setErrorGeo(`ERROR(${err.code}): ${err.message}`)
-          }
-          
-       navigator.geolocation.getCurrentPosition(success, errorGeo, options);
+         var geocoder, map;
+         function initialize() {
+           geocoder = new google.maps.Geocoder();
+           var latlng = new google.maps.LatLng(-34.397, 150.644);
+           var mapOptions = {
+             zoom: 8,
+             center: latlng
+           }
+           map = new google.maps.Map(document.getElementById('map'), mapOptions);
+         }
+       
+         function codeAddress(longitud, latitud) {
+           //console.log("Detect", longitud+","+latitud)
+           var address = (longitud+","+latitud);
+           geocoder.geocode( { 'address': address}, function(results, status) {
+             if (status == 'OK') {
+                //console.log("mapaComplet",results)
+                setAddress(results[1].formatted_address)
+               map.setCenter(results[0].geometry.location);
+               var marker = new google.maps.Marker({
+                   map: map,
+                   position: results[0].geometry.location
+               });
+             } else {
+               setErrorGeo('Geocode was not successful for the following reason: ' + status);
+             }
+           });
+         }
 
-       //Insert Metrics
+        }
 
-       var obj ={
+      },[])
+
+      var obj ={
         "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) ,
-        "address": address ? address : null,
+        "address": address ? address : "",
         "addressState": address ? address.split(",").reverse()[1] : null,
         "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
         "creationDate": new  Date(Date.now()).toISOString(),
@@ -147,63 +178,52 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
         "typeDevice":  device ? device : null,
         "startDate": new  Date(Date.now()).toISOString()
       }
-    
-      if(obj.idQr!==null && obj.typeDevice!==null && obj.fingerPrint!==null && obj.creationDate!==null && obj.startDate!==null){
-        addMetrics(obj)
-      }
-    
-      async function addMetrics(obj) {
-    
-        const optionsPost = { 
-          method: 'POST', 
-          body: JSON.stringify(obj),
-          headers: {
-                'Content-Type': 'application/json'
-              }    
-        };
-    
-    
-        try {
-          let response = await fetch(`${process.env.APIURLMETRICS}`, optionsPost);
-          let insertResp = await response.json();
-          console.log(insertResp)
-        } catch(err) {
-          // atrapa errores tanto en fetch como en response.json
-          console.log(err);
+      var arr = []
+      React.useMemo(()=>{
+        arr.push([ obj ]) ;
+
+        console.log("Dentro UseMemo",arr)
+        
+        var active = false;
+
+        //User permite ubicación
+        if(obj.address.length>0  ){
+          active= true
+          if(active){
+            addMetrics(arr[0])
+          }
         }
-      }
-
-      }, [])
-
+        else{
+          addMetrics(arr[0])
+          
+        }
+     
       
-  var geocoder, map;
-  function initialize() {
-    geocoder = new google.maps.Geocoder();
-    var latlng = new google.maps.LatLng(-34.397, 150.644);
-    var mapOptions = {
-      zoom: 8,
-      center: latlng
-    }
-    map = new google.maps.Map(document.getElementById('map'), mapOptions);
-  }
+      },[obj.idQr, obj.address])
 
-  function codeAddress(longitud, latitud) {
-    //console.log("Detect", longitud+","+latitud)
-    var address = (longitud+","+latitud);
-    geocoder.geocode( { 'address': address}, function(results, status) {
-      if (status == 'OK') {
-         //console.log("mapaComplet",results)
-         setAddress(results[1].formatted_address)
-        map.setCenter(results[0].geometry.location);
-        var marker = new google.maps.Marker({
-            map: map,
-            position: results[0].geometry.location
-        });
-      } else {
-        setErrorGeo('Geocode was not successful for the following reason: ' + status);
-      }
-    });
-  }
+   
+  
+     async function addMetrics(obj) {
+   
+       const optionsPost = { 
+         method: 'POST', 
+         body: JSON.stringify(obj),
+         headers: {
+               'Content-Type': 'application/json'
+             }    
+       };
+   
+   
+       try {
+         let response = await fetch(`${process.env}`, optionsPost);
+         let insertResp = await response.json();
+         console.log(insertResp)
+       } catch(err) {
+         // atrapa errores tanto en fetch como en response.json
+         console.log(err);
+       }
+     }
+
 
   
     return (
@@ -233,7 +253,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                     <Grid item xs={12} sm={3} lg={4} />
                     
                     <div id="map" style= {{width: 100 + 'px', height:100+'px', display: 'none'}} ></div>
-                                  
+                          
                 </Grid>      
             </CardContent>
             <Footer/>
