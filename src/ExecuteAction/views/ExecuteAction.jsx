@@ -182,19 +182,19 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
       React.useMemo(()=>{
         arr.push([ obj ]) ;
 
-        console.log("Dentro UseMemo",arr)
+        //console.log("Dentro UseMemo",arr)
         
         var active = false;
-
+      
         //User permite ubicación
         if(obj.address.length>0  ){
           active= true
           if(active){
-            addMetrics(arr[0])
+            addMetrics(obj)
           }
         }
         else{
-          addMetrics(arr[0])
+          addMetrics(obj)
           
         }
      
