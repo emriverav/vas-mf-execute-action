@@ -215,7 +215,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
    
    
        try {
-         let response = await fetch(`${process.env}`, optionsPost);
+         let response = await fetch(`${process.env.APIURLMETRICS}`, optionsPost);
          let insertResp = await response.json();
          console.log(insertResp)
        } catch(err) {
