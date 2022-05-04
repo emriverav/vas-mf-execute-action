@@ -37,8 +37,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     const [address, setAddress]= useState("");
     const [errorGeolocation, setErrorGeo]=useState("");
     const [geolocation,setGeolocation] =useState([]);
-    const [myArray, setMyArray] = useState([]);
-
+    const [geolocationUser, setGeolocationUser] = useState(false)
+    
     var client = new ClientJS();
 	  var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
     //console.log("Data Device", dataDevice);
@@ -104,7 +104,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             setError("No hay IDQR")
         }
         if (navigator.geolocation) {
-
+          setGeolocationUser(true)
           initialize();
           var options = {
               enableHighAccuracy: true,
@@ -126,8 +126,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
               setErrorGeo(`ERROR(${err.code}): ${err.message}`)
             }
             
-         navigator.geolocation.getCurrentPosition(success, errorGeo, options);
-          
+          navigator.geolocation.getCurrentPosition(success, errorGeo, options);
+       
          var geocoder, map;
          function initialize() {
            geocoder = new google.maps.Geocoder();
@@ -156,53 +156,61 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
              }
            });
          }
-
+         
+        }else {
+          setGeolocationUser(false)
         }
 
       },[])
 
-      var obj ={
-        "description": resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) ,
-        "address": address ? address : "",
-        "addressState": address ? address.split(",").reverse()[1] : null,
-        "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
-        "creationDate": new  Date(Date.now()).toISOString(),
-        "fingerPrint": finger? finger: finger,
-        "idAction": resp.action ? resp.action : null,
-        "idCat": resp.idCat ?  resp.idCat: null,
-        "idForm": resp.idForm ? resp.idForm : null,
-        "idQr": idQr ? idQr : null,
-        "latitude": geolocation ? geolocation[0] :"",
-        "longitude": geolocation ? geolocation[1] :"",
-        "subcategory": resp.subcategory ? resp.subcategory : null ,
-        "typeDevice":  device ? device : null,
-        "startDate": new  Date(Date.now()).toISOString()
-      }
-      var arr = []
+      //var arr = []
+        var obj ={
+          "description": resp.action ? resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) : null ,
+          "address": address ? address : "",
+          "addressState": address ? address.split(",").reverse()[1] : null,
+          "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
+          "creationDate": new  Date(Date.now()).toISOString(),
+          "fingerPrint": finger? finger: finger,
+          "idAction": resp.action ? resp.action : null,
+          "idCat": resp.idCat ?  resp.idCat: null,
+          "idForm": resp.idForm ? resp.idForm : null,
+          "idQr": idQr ? idQr : null,
+          "latitude": geolocation ? geolocation[0] :"",
+          "longitude": geolocation ? geolocation[1] :"",
+          "subcategory": resp.subcategory ? resp.subcategory : null ,
+          "typeDevice":  device ? device : null,
+          "startDate": new  Date(Date.now()).toISOString()
+        }
+
+      
       React.useMemo(()=>{
-        arr.push([ obj ]) ;
-
-        //console.log("Dentro UseMemo",arr)
-        
-        var active = false;
+       var active = geolocationUser;
       
-        //User permite ubicación
-        if(obj.address.length>0  ){
-          active= true
-          if(active){
-            addMetrics(obj)
-          }
-        }
-        else{
-          addMetrics(obj)
-          
-        }
+       navigator.permissions.query({name:'geolocation'})
+        .then(function(permissionStatus) {   
+            if(permissionStatus.state == 'granted') {             
+              
+              if(active){
+                if(obj.address.length>0  ){
+                  addMetrics(obj)
+                }   
+              }  
+
+              if(!active && permissionStatus.state == 'granted' ){
+                return
+              }
+ 
+            }else{
+              if(!active && permissionStatus.state !== 'granted'){
+                addMetrics(obj)
+              }
+            }
+        });
+            
+      },[obj.address])
+      
      
-      
-      },[obj.idQr, obj.address])
-
-   
-  
+     
      async function addMetrics(obj) {
    
        const optionsPost = { 
@@ -212,8 +220,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                'Content-Type': 'application/json'
              }    
        };
-   
-   
+
        try {
          let response = await fetch(`${process.env.APIURLMETRICS}`, optionsPost);
          let insertResp = await response.json();
