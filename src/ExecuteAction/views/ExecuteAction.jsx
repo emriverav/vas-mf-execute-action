@@ -32,12 +32,14 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     const [searchParams] = useSearchParams();
     var idQr = searchParams.get('idQr');
     const [resp, setResp]  = useState([]);
-
-    const [error, setError] = useState([]);
+    
+    const [error, setError] = useState("");
     const [address, setAddress]= useState("");
     const [errorGeolocation, setErrorGeo]=useState("");
     const [geolocation,setGeolocation] =useState([]);
-    const [geolocationUser, setGeolocationUser] = useState(false)
+    const [geolocationUser, setGeolocationUser] = useState(false);
+    
+
     
     var client = new ClientJS();
 	  var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
@@ -66,12 +68,9 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             const response = await fetch(url);
     
             if (response.status == 200) {
-                const data = await response.json();
-
+                const data = await response.json();          
                 if(data.qr){
                   setResp(data.qr)
-                }else{
-                  setError("No hay Datos para Mostrar")
                 }
                 if(data.response.code==1000){
                   setError("QR no está activo")
@@ -165,7 +164,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
 
       //var arr = []
         var obj ={
-          "description": resp.action ? resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) : null ,
+          "description": resp.action ? resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) : error ,
           "address": address ? address : "",
           "addressState": address ? address.split(",").reverse()[1] : null,
           "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
@@ -185,7 +184,6 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
       
       React.useMemo(()=>{
        var active = geolocationUser;
-      
        navigator.permissions.query({name:'geolocation'})
         .then(function(permissionStatus) {   
             if(permissionStatus.state == 'granted') {             
@@ -201,13 +199,18 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
               }
  
             }else{
-              if(!active && permissionStatus.state !== 'granted'){
-                addMetrics(obj)
-              }
+             
+             if(active){
+              addMetrics(obj)
+             }
+             if(!active && obj.description.length>0){
+              addMetrics(obj)
+             }
+                      
             }
         });
             
-      },[obj.address])
+      },[obj.address,obj.description, obj.subcategory])
       
      
      
