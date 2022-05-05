@@ -122,6 +122,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             }
             
             function errorGeo(err) {
+              setGeolocationUser(false)
+              //console.log(`ERROR(${err.code}): ${err.message}`)
               setErrorGeo(`ERROR(${err.code}): ${err.message}`)
             }
             
@@ -151,7 +153,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                    position: results[0].geometry.location
                });
              } else {
-               setErrorGeo('Geocode was not successful for the following reason: ' + status);
+               setGeolocationUser(false)
+               console.log('Geocode was not successful for the following reason: ' + status);
              }
            });
          }
@@ -184,21 +187,18 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
       
       React.useMemo(()=>{
        var active = geolocationUser;
-       navigator.permissions.query({name:'geolocation'})
-        .then(function(permissionStatus) {   
-            if(permissionStatus.state == 'granted') {             
-              
+             //Se valida if User permite ubicación        
               if(active){
-                if(obj.address.length>0  ){
-                  addMetrics(obj)
-                }   
-              }  
-
-              if(!active && permissionStatus.state == 'granted' ){
-                return
-              }
- 
-            }else{
+                  if(obj.address.length>0  ){
+                    addMetrics(obj)
+                  }   
+               
+                if(!active ){
+                  return
+                }
+            }
+            //Cuando user no permite ubicación
+            else{
              
              if(active){
               addMetrics(obj)
@@ -208,8 +208,6 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
              }
                       
             }
-        });
-            
       },[obj.address,obj.description, obj.subcategory])
       
      
