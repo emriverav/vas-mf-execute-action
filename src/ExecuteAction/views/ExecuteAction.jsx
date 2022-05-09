@@ -208,9 +208,8 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
              }
                       
             }
-      },[obj.address,obj.description, obj.subcategory])
+      },[obj.address,obj.description])
       
-     
      
      async function addMetrics(obj) {
    
