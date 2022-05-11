@@ -48,7 +48,38 @@ export const Form = (props) => {
     validators: []
   };
 
+  const  fetchCustomers = async (obj) =>  {
+   let objToSend = {
+    "idCat": props.idCat ,
+    "subcategory": props.SubCat,
+    "idQr": props.idQr,
+    "dataForm": obj
+    } 
 
+    const optionsPost = { 
+      method: 'POST', 
+      body: JSON.stringify(objToSend),
+      headers: {
+            'Content-Type': 'application/json'
+          }    
+    };
+    try {
+      let url = `${process.env.APICUSTOMERS}` 
+      const response = await fetch(url,optionsPost);
+
+      if (response.status == 200) {
+          const data = await response.json();          
+  
+        } else {
+          throw  new Error(response.status);
+        }
+   
+    } catch(err) {
+      // atrapa errores tanto en fetch como en response.json
+      console.log("Error Peticion ", err );
+  
+    }
+  }
   
 
   return (
@@ -63,6 +94,7 @@ export const Form = (props) => {
         // TODO: Contact some API with the data
         //console.log("DATAJSON",definition)
         //console.log("submitting", component.getValues());
+        fetchCustomers(component.getValues())
         // Simulate response from API saying that email address is already in use and report this
         // error to the user
         if (component.get("fields.email.value") === "taken@example.com") {

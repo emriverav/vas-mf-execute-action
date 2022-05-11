@@ -251,7 +251,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                             <Divider />
                          
                             {
-                             resp.length<=0  ? error : (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} idQr ={`${resp.idQr}`} />))
+                             resp.length<=0  ? error : (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} idQr ={`${resp.idQr}`}  idCat ={`${resp.idCat}`} SubCat = {`${resp.subcategory}`}/>))
                             }
                                                                              
                         </Paper>
