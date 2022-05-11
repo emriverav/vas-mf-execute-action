@@ -28,7 +28,7 @@
 	cenLoader: {
 		position: 'absolute',
 		top: '50%',
-		left: '50%',
+		left: '43%',
 		transform: 'translate(-50%, -50%)',
 		width: '60px !important',
     	height: '60px !important',
