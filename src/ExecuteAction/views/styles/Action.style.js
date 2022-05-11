@@ -24,7 +24,16 @@
     title: {
 		fontWeight: 'bold !important',
 		padding: '10px 20px'
-	}
+	},
+	cenLoader: {
+		position: 'absolute',
+		top: '50%',
+		left: '50%',
+		transform: 'translate(-50%, -50%)',
+		width: '60px !important',
+    	height: '60px !important',
+		color:'#9c27b0'
+	  }
  }));
 
  export default useStyles;

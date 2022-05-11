@@ -11,7 +11,7 @@
  import React,{useEffect, useMemo, useState} from 'react';
  import Header from '../../Header/views/Header';
  import Footer from '../../Footer/views/Footer';
- import useStyles from './styles/Login.style';
+ import useStyles from './styles/Action.style';
  import { 
     Grid, 
     Typography,
@@ -25,7 +25,7 @@ import Imagen from '../../Imagen/Imagen';
 import { Form } from '../../Form/Form';
 import { ClientJS } from 'clientjs';
 import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
-
+import CircularProgress from '@mui/material/CircularProgress';
 
 
  const View = (props) => {
@@ -35,7 +35,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     
     const [error, setError] = useState("");
     const [address, setAddress]= useState("");
-    const [errorGeolocation, setErrorGeo]=useState("");
+    const [loader, setLoader]=useState(true);
     const [geolocation,setGeolocation] =useState([]);
     const [geolocationUser, setGeolocationUser] = useState(false);
     
@@ -56,7 +56,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
         idQr = sessionStorage.getItem("idQr")
     }
 
-    const { mt3, paperContainer, title } = useStyles();  
+    const { mt3, paperContainer, title ,cenLoader } = useStyles();  
 
     useEffect(() => {
   
@@ -68,18 +68,22 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             const response = await fetch(url);
     
             if (response.status == 200) {
-                const data = await response.json();          
+                const data = await response.json();
+                setLoader(false)          
                 if(data.qr){
                   setResp(data.qr)
                 }
                 if(data.response.code==1000){
                   setError("QR no está activo")
+                  setLoader(false) 
                 }
                 if(data.response.code==1001){
                   setError("QR aun no está vigente")
+                  setLoader(false) 
                 }
                 if(data.response.code==1002){
                   setError("QR Vigencia Expirada")
+                  setLoader(false) 
                 }
                
                
@@ -91,6 +95,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
             // atrapa errores tanto en fetch como en response.json
             console.log("Error Peticion ", err );
             setError(err)
+            setLoader(false) 
           }
         
         }
@@ -236,6 +241,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
     return (
         <>
             <Header/>
+           
             <CardContent>
                 <Grid container spacing={3}>   
                     <Grid item xs={12} sm={3} lg={4}>
@@ -243,7 +249,7 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                             Reciclaje
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} sm={6} lg={4} className={mt3}>
+                    {loader ? <CircularProgress  disableShrink className={cenLoader} /> : <Grid item xs={12} sm={6} lg={4} className={mt3}>
                         <Paper className={paperContainer}>
                             <Typography variant='subtitle1' className={title}>
                                 Categoría : {  resp.subcategory ? resp.subcategory.split("|")[1] : null }
@@ -256,13 +262,14 @@ import { getBrowserId,getDevice } from "../../Utils/FingerPrint";
                                                                              
                         </Paper>
                         
-                    </Grid>
+                    </Grid> 
+                    }
                     <Grid item xs={12} sm={3} lg={4} />
                     
                     <div id="map" style= {{width: 100 + 'px', height:100+'px', display: 'none'}} ></div>
                           
                 </Grid>      
-            </CardContent>
+            </CardContent> 
             <Footer/>
         </>
     );
