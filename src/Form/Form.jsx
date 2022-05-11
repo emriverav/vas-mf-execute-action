@@ -1,10 +1,12 @@
 import React, {useState} from 'react'
 import Component from "mson-react/lib/component";
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import { IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close'
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
+import {getWellFormedField} from '../Utils/getWellFormedField'
 
 const style = {
   position: 'absolute',
@@ -24,27 +26,30 @@ export const Form = (props) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+
   var resp = JSON.parse(props.val)
-  resp.push({
+  var formatteJson = resp.map((item,index)=>getWellFormedField(item))
+  formatteJson.push({
     name: "submit",
     component: "ButtonField",
     type: "submit",
-    label: "Submit",
+    label: "Enviar",
     icon: "Save"
   },
   {
     name: "reset",
     component: "ButtonField",
-    label: "Reset",
+    label: "Limpiar",
     icon: "Clear"
   }) 
-
   const definition = {
     component: "Form",
-    fields: resp,
+    fields: formatteJson,
     validators: []
   };
 
+
+  
 
   return (
     <> 
@@ -75,7 +80,16 @@ export const Form = (props) => {
         aria-describedby="modal-modal-description"
       >
         <Fade in={open}>
+
           <Box sx={style}>
+          <IconButton sx={{
+            position: 'absolute',
+            right: 6,
+            top: 6,
+            color: '#000',
+          }} onClick={handleClose}>
+                          <CloseIcon />
+              </IconButton>
             <Typography id="modal-modal-title" variant="h8" component="h4">
               ¡Tus datos fueron enviados!
             </Typography>
