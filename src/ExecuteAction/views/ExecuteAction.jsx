@@ -252,7 +252,7 @@ import CircularProgress from '@mui/material/CircularProgress';
                     {loader ? <CircularProgress  disableShrink className={cenLoader} /> : <Grid item xs={12} sm={6} lg={4} className={mt3}>
                         <Paper className={paperContainer}>
                             <Typography variant='subtitle1' className={title}>
-                                Categoría : {  resp.subcategory ? resp.subcategory.split("|")[1] : null }
+                              Sub-categoría : {  resp.subcategory ? resp.subcategory.split("|")[1] : null }
                             </Typography>
                             <Divider />
                          
