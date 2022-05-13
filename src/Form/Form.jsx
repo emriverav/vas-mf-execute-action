@@ -80,6 +80,25 @@ export const Form = (props) => {
   
     }
   }
+
+  const  fetchSendNotification = async (idform, email) =>  {
+
+     try {
+       let url = `${process.env.APISENDNOFICATION}${idform}/${email}`+'/3';
+       const response = await fetch(url);
+ 
+       if (response.status == 200) {
+           const data = await response.json();          
+         } else {
+           throw  new Error(response.status);
+         }
+    
+     } catch(err) {
+       // atrapa errores tanto en fetch como en response.json
+       console.log("Error Peticion ", err );
+   
+     }
+   }
   
 
   return (
@@ -92,14 +111,15 @@ export const Form = (props) => {
       onSubmit={({ component }) => {
         handleOpen()
         // TODO: Contact some API with the data
-        //console.log("DATAJSON",definition)
+        //console.log("FORMEMAIL",component.get("fields.email.value"))
         //console.log("submitting", component.getValues());
         fetchCustomers(component.getValues())
         // Simulate response from API saying that email address is already in use and report this
         // error to the user
-        if (component.get("fields.email.value") === "taken@example.com") {
-          component.set({ "fields.email.err": "already in use" });
+        if (component.get("fields.email.value") !== "" ) {
+          fetchSendNotification(props.idForm, component.get("fields.email.value") ) 
         } else {
+          component.set({ "fields.email.err": "Email no agregado" });
           // Everything was successful so redirect, show confirmation, etc...
         }
       }}

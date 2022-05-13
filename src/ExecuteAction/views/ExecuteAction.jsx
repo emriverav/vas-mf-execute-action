@@ -39,8 +39,6 @@ import CircularProgress from '@mui/material/CircularProgress';
     const [geolocation,setGeolocation] =useState([]);
     const [geolocationUser, setGeolocationUser] = useState(false);
     
-
-    
     var client = new ClientJS();
 	  var dataDevice = client.getBrowserData().ua + client.getOS() + client.getCPU() + client.getSystemLanguage();
     //console.log("Data Device", dataDevice);
@@ -128,8 +126,7 @@ import CircularProgress from '@mui/material/CircularProgress';
             
             function errorGeo(err) {
               setGeolocationUser(false)
-              //console.log(`ERROR(${err.code}): ${err.message}`)
-              setErrorGeo(`ERROR(${err.code}): ${err.message}`)
+              console.log(`ERROR(${err.code}): ${err.message}`)
             }
             
           navigator.geolocation.getCurrentPosition(success, errorGeo, options);
@@ -257,7 +254,7 @@ import CircularProgress from '@mui/material/CircularProgress';
                             <Divider />
                          
                             {
-                             resp.length<=0  ? error : (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} idQr ={`${resp.idQr}`}  idCat ={`${resp.idCat}`} SubCat = {`${resp.subcategory}`}/>))
+                             resp.length<=0  ? error : (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} idQr ={`${resp.idQr}`}  idCat ={`${resp.idCat}`} SubCat = {`${resp.subcategory}`} idForm={`${resp.idForm}`} />))
                             }
                                                                              
                         </Paper>

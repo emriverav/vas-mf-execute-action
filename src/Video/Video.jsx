@@ -7,13 +7,13 @@ const Video = (props) => {
   return <>
    
     {
-      result ? <video width="320" height="240" controls>
+      result ? <video width="320" height="240" controls autoplay>
       <source src={url} type="video/mp4"/>
       Your browser does not support the video tag.
       </video>  :
       <iframe id="player"  width="95%" height="100%"
-          src={urlRaplace}
-          title="YouTube video player" allowFullScreen>
+          src={urlRaplace+'?autoplay=1'}
+          title="YouTube video player" allow='autoplay' allowFullScreen>
       </iframe>
     }
     
