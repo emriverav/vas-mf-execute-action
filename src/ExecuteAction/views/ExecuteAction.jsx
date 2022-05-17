@@ -171,7 +171,7 @@ import CircularProgress from '@mui/material/CircularProgress';
         var obj ={
           "description": resp.action ? resp.action == '001' ? "Action Form" : (resp.action == '002' ? "Action view Video" : "Action Site" ) : error ,
           "address": address ? address : "",
-          "addressState": address ? address.split(",").reverse()[1] : null,
+          "addressState": address ? address.split(",").reverse()[1].replace(/ /g, "") : null,
           "addressZipCode": address ? (address.length>2 ?  address.split(",").reverse()[2].split(" ")[1] : null ):null,
           "creationDate": new  Date(Date.now()).toISOString(),
           "fingerPrint": finger? finger: finger,
