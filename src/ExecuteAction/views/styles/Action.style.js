@@ -33,7 +33,12 @@
 		width: '60px !important',
     	height: '60px !important',
 		color:'#9c27b0'
-	  }
+	  },
+	  center:{
+		textAlign:'center',
+		position: 'relative',
+    	height: 100
+	}
  }));
 
  export default useStyles;

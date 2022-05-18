@@ -17,7 +17,8 @@
     Typography,
     CardContent,
     Paper,
-    Divider
+    Divider,
+    Link
 } from '@mui/material';
 import { useSearchParams  } from 'react-router-dom';
 import Video from '../../Video/Video';
@@ -32,6 +33,7 @@ import CircularProgress from '@mui/material/CircularProgress';
     const [searchParams] = useSearchParams();
     var idQr = searchParams.get('idQr');
     const [resp, setResp]  = useState([]);
+    const [respCode, setRespCode]  = useState([]);
     
     const [error, setError] = useState("");
     const [address, setAddress]= useState("");
@@ -54,7 +56,7 @@ import CircularProgress from '@mui/material/CircularProgress';
         idQr = sessionStorage.getItem("idQr")
     }
 
-    const { mt3, paperContainer, title ,cenLoader } = useStyles();  
+    const { mt3, paperContainer, title ,cenLoader,center } = useStyles();  
 
     useEffect(() => {
   
@@ -70,6 +72,9 @@ import CircularProgress from '@mui/material/CircularProgress';
                 setLoader(false)          
                 if(data.qr){
                   setResp(data.qr)
+                }
+                if(data.response){
+                  setRespCode(data.response)
                 }
                 if(data.response.code==1000){
                   setError("QR no está activo")
@@ -244,7 +249,7 @@ import CircularProgress from '@mui/material/CircularProgress';
                 <Grid container spacing={3}>   
                     <Grid item xs={12} sm={3} lg={4}>
                         <Typography variant='h5' className={title}>
-                            Reciclaje
+                            {resp.catDescription ? resp.catDescription : null}
                         </Typography>
                     </Grid>
                     {loader ? <CircularProgress  disableShrink className={cenLoader} /> : <Grid item xs={12} sm={6} lg={4} className={mt3}>
@@ -255,7 +260,7 @@ import CircularProgress from '@mui/material/CircularProgress';
                             <Divider />
                          
                             {
-                             resp.length<=0  ? error : (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} idQr ={`${resp.idQr}`}  idCat ={`${resp.idCat}`} SubCat = {`${resp.subcategory}`} idForm={`${resp.idForm}`} />))
+                              respCode.code == "200" ? (resp.action == '003' ?  <Imagen url={`${resp.image}`} href={`${resp.value}`}/> : ( resp.action == '002' ? <Video url={`${resp.value}`}/> : <Form val = {`${resp.value}`} idQr ={`${resp.idQr}`}  idCat ={`${resp.idCat}`} SubCat = {`${resp.subcategory}`} idForm={`${resp.idForm}`} />)) : error
                             }
                                                                              
                         </Paper>
@@ -268,6 +273,9 @@ import CircularProgress from '@mui/material/CircularProgress';
                           
                 </Grid>      
             </CardContent> 
+              <Grid item xs={12} sm={3} lg={4} className={center}>
+                    <Link  href="https://assetspwa.liverpool.com.mx/ayuda/index.html#/sec/terminos-y-condiciones/proteccion-de-datos/aviso-clientes" target='_Blank' >Política de privacidad</Link>
+              </Grid>   
             <Footer/>
         </>
     );
