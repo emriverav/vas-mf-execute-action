@@ -183,6 +183,7 @@ import CircularProgress from '@mui/material/CircularProgress';
           "longitude": geolocation ? geolocation[1] :"",
           "subcategory": resp.subcategory ? resp.subcategory : null ,
           "typeDevice":  device ? device : null,
+          "catDescription": resp.catDescription ? resp.catDescription : null,
           "startDate": new  Date(Date.now()).toISOString()
         }
 
