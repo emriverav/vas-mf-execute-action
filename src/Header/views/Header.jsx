@@ -21,7 +21,7 @@
      <Box sx={{ flexGrow: 1 }}>
        <AppBar position="static">
          <Toolbar>
-           <img src="https://micredito.liverpool.com.mx:9443/cdn//app/assets/images/liverpool-logo.svg" alt="Liverpool, es parte de tu vida" style={{ maxWidth: "165px" }} />
+           <img src="https://micredito.liverpool.com.mx:9443/cdn//app/assets/images/liverpool-logo.svg" alt="Liverpool, es parte de tu vida" style={{ maxWidth: "165px", margin: '0 auto' }} />
           
            <IconButton
              size="large"

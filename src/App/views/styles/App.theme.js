@@ -34,7 +34,7 @@
         MuiButton: {
             styleOverrides: {
                 root: {
-                    textTransform: 'none'
+                    textTransform: 'none', 
                 }
             }
         },
@@ -44,7 +44,19 @@
                     color: '#ff0000'
                 }
             }
-        }
+        },
+        MuiLink: {
+            styleOverrides: {
+              root: {
+                color: '#fff !important', 
+                background: '#e10098',
+                padding: '10px',
+                borderRadius: '4px',
+                textDecoration: 'none'
+              }
+            }
+      }
+          
     }
  });
 

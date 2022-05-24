@@ -56,7 +56,7 @@ import CircularProgress from '@mui/material/CircularProgress';
         idQr = sessionStorage.getItem("idQr")
     }
 
-    const { mt3, paperContainer, title ,cenLoader,center } = useStyles();  
+    const { mt3, paperContainer, title ,cenLoader,center, backImg } = useStyles();  
 
     useEffect(() => {
   
@@ -245,8 +245,8 @@ import CircularProgress from '@mui/material/CircularProgress';
         <>
             <Header/>
            
-            <CardContent>
-                <Grid container spacing={3}>   
+            <CardContent className={backImg}>
+                <Grid container spacing={3} >  
                     <Grid item xs={12} sm={3} lg={4}>
                         <Typography variant='h5' className={title}>
                             {resp.catDescription ? resp.catDescription : null}
@@ -255,7 +255,7 @@ import CircularProgress from '@mui/material/CircularProgress';
                     {loader ? <CircularProgress  disableShrink className={cenLoader} /> : <Grid item xs={12} sm={6} lg={4} className={mt3}>
                         <Paper className={paperContainer}>
                             <Typography variant='subtitle1' className={title}>
-                              Sub-categoría : {  resp.subcategory ? resp.subcategory.split("|")[1] : null }
+                               {  resp.subcategory ? resp.subcategory.split("|")[1] : null }
                             </Typography>
                             <Divider />
                          
@@ -264,7 +264,10 @@ import CircularProgress from '@mui/material/CircularProgress';
                             }
                                                                              
                         </Paper>
-                        
+
+                        <Grid item xs={12} sm={3} lg={4} className={center}>
+                              <Link  href="https://assetspwa.liverpool.com.mx/ayuda/index.html#/sec/terminos-y-condiciones/proteccion-de-datos/aviso-clientes" target='_Blank' >Política de privacidad</Link>
+                        </Grid>     
                     </Grid> 
                     }
                     <Grid item xs={12} sm={3} lg={4} />
@@ -273,9 +276,7 @@ import CircularProgress from '@mui/material/CircularProgress';
                           
                 </Grid>      
             </CardContent> 
-              <Grid item xs={12} sm={3} lg={4} className={center}>
-                    <Link  href="https://assetspwa.liverpool.com.mx/ayuda/index.html#/sec/terminos-y-condiciones/proteccion-de-datos/aviso-clientes" target='_Blank' >Política de privacidad</Link>
-              </Grid>   
+              
             <Footer/>
         </>
     );

@@ -7,7 +7,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import {getWellFormedField} from '../Utils/getWellFormedField'
-
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from "./style/style";
 const style = {
   position: 'absolute',
   top: '50%',
@@ -103,6 +104,7 @@ export const Form = (props) => {
 
   return (
     <> 
+    <ThemeProvider theme={theme}>
       <Component
       definition={definition}
       
@@ -124,6 +126,7 @@ export const Form = (props) => {
         }
       }}
     />
+    </ThemeProvider>
 
       <Modal
         open={open}
