@@ -42,7 +42,8 @@
 	backImg:{
 		backgroundImage: 'url(https://miscitas.liverpool.com.mx/resources/images/backcitas.jpg)',
 		backgroundSize: '100% 100%',
-		backgroundRepeat: 'no-repeat'
+		backgroundRepeat: 'no-repeat',
+		minHeight: '450px'
 	}
 }));
 
