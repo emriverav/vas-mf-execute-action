@@ -1,0 +1,12 @@
+.MuiButton-textPrimary{
+    margin: 20px 0 0px 20px !important;
+    border-radius: 4px !important;
+    background: #666666 !important;
+    color: #f5f5f5 !important;
+}
+.MuiFormLabel-root.Mui-focused{
+    color : #e10098 !important;
+}
+.MuiInput-underline:after{
+    border-bottom: 2px solid #e10098 !important;
+}

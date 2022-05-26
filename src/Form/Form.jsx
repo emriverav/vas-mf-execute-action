@@ -9,6 +9,8 @@ import Fade from '@mui/material/Fade';
 import {getWellFormedField} from '../Utils/getWellFormedField'
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from "./style/style";
+import './style/style.css'
+
 const style = {
   position: 'absolute',
   top: '50%',
